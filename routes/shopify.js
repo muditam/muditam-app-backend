@@ -11,10 +11,10 @@ router.get('/products', async (req, res) => {
           'X-Shopify-Access-Token': process.env.SHOPIFY_ACCESS_TOKEN,
         },
       });
-  
+   
       const products = response.data.products;
   
-      const tagged = products.filter(
+      const tagged = products.filter( 
         (p) =>
           p.status !== 'draft' &&
           p.tags?.toLowerCase().includes('product') &&
