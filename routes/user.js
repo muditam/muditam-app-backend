@@ -30,4 +30,25 @@ router.post('/', async (req, res) => {
   }
 });
 
+router.post('/update', async (req, res) => {
+  const { phone, name, yearOfBirth, gender, email } = req.body;
+  try {
+    const updatedUser = await User.findOneAndUpdate(
+      { phone },
+      { name, yearOfBirth, gender, email },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ success: false, message: 'User not found for update' });
+    }
+
+    return res.status(200).json({ success: true, message: 'User updated successfully', user: updatedUser });
+  } catch (error) {
+    console.error('Error updating user:', error);
+    return res.status(500).json({ success: false, error: 'Could not update user' });
+  }
+});
+
+
 module.exports = router;
