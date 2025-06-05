@@ -6,6 +6,7 @@ require('dotenv').config();
 const shopifyRoutes = require('./routes/shopify');
 const userRoutes = require('./routes/user');
 const quizRoutes = require('./routes/quiz');
+const cartRoutes = require('./routes/cart');
 
 const app = express();
 app.use(cors());
@@ -23,6 +24,7 @@ mongoose.connect(process.env.MONGO_URI, {
 app.use('/api/shopify', shopifyRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/quiz', quizRoutes);
+app.use('/api/cart', cartRoutes);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
