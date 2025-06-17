@@ -8,8 +8,25 @@ const userSchema = new mongoose.Schema({
   },
   name: String,
   yearOfBirth: String,
-  gender: String,
+  gender: String, 
   email: String,
+  hasPurchased: {
+    type: Boolean,
+    default: false,  
+  },
+  currentKitNumber: {
+    type: Number,
+    default: 1,
+  },
+  completedKits: {
+    type: [Number],
+    default: [],
+  },
+  purchasedProducts: {
+  type: [String], // Shopify Product IDs
+  default: [],
+},
+  expoPushToken: { type: String },
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);
