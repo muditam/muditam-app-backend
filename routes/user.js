@@ -1,8 +1,27 @@
+require('dotenv').config();
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
+const multer = require('multer');
+const AWS = require('aws-sdk');
+const crypto = require('crypto');
+const path = require('path');
 
-// 🟣 Create new user
+
+const s3 = new AWS.S3({
+  endpoint: 'https://s3.ap-southeast-2.wasabisys.com',
+  accessKeyId: process.env.WASABI_ACCESS_KEY,
+  secretAccessKey: process.env.WASABI_SECRET_KEY,
+  region: 'ap-southeast-2',
+});
+
+
+// Multer setup (for file uploads from React Native)
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
+
+// Create new user
 router.post('/', async (req, res) => {
   const { phone, name, yearOfBirth, gender, email } = req.body;
   try {
@@ -18,28 +37,28 @@ router.post('/', async (req, res) => {
   }
 });
 
-// 🟣 Update user details
-router.post('/update', async (req, res) => {
-  const { phone, name, yearOfBirth, gender, email } = req.body;
-  try {
-    const updatedUser = await User.findOneAndUpdate(
-      { phone },
-      { name, yearOfBirth, gender, email },
-      { new: true }
-    );
+// Update user details
+// router.post('/update', async (req, res) => {
+//   const { phone, name, yearOfBirth, gender, email } = req.body;
+//   try {
+//     const updatedUser = await User.findOneAndUpdate(
+//       { phone },
+//       { name, yearOfBirth, gender, email },
+//       { new: true }
+//     );
 
-    if (!updatedUser) {
-      return res.status(404).json({ success: false, message: 'User not found for update' });
-    }
+//     if (!updatedUser) {
+//       return res.status(404).json({ success: false, message: 'User not found for update' });
+//     }
 
-    return res.status(200).json({ success: true, message: 'User updated successfully', user: updatedUser });
-  } catch (error) {
-    console.error('Error updating user:', error);
-    return res.status(500).json({ success: false, error: 'Could not update user' });
-  }
-});
+//     return res.status(200).json({ success: true, message: 'User updated successfully', user: updatedUser });
+//   } catch (error) {
+//     console.error('Error updating user:', error);
+//     return res.status(500).json({ success: false, error: 'Could not update user' });
+//   }
+// });
 
-// 🟣 Get user by phone
+// Get user by phone
 router.get('/:phone', async (req, res) => {
   try {
     const user = await User.findOne({ phone: req.params.phone }).lean();
@@ -51,7 +70,7 @@ router.get('/:phone', async (req, res) => {
   }
 });
 
-// 🟣 Check purchase status
+// Check purchase status
 router.get('/purchase-status/:phone', async (req, res) => {
   try {
     const user = await User.findOne({ phone: req.params.phone });
@@ -86,7 +105,7 @@ router.post('/mark-purchased', async (req, res) => {
 });
 
 
-// 🟣 Get kit progress by phone
+// Get kit progress by phone
 router.get('/kit-progress/:phone', async (req, res) => {
   try {
     const user = await User.findOne({ phone: req.params.phone });
@@ -134,6 +153,108 @@ router.post('/save-token', async (req, res) => {
   await User.findByIdAndUpdate(userId, { expoPushToken });
   res.send({ success: true });
 });
+
+// Already in your routes file
+router.post('/video-feedback', async (req, res) => {
+  const { phone, videoId, action } = req.body;
+  if (!phone || !videoId || !['like', 'dislike'].includes(action)) {
+    return res.status(400).json({ error: 'Invalid input' });
+  }
+
+  try {
+    const user = await User.findOne({ phone });
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    const videoIdStr = String(videoId);
+    const existing = user.likedVideos.find(v => v.videoId === videoIdStr);
+
+    if (existing) {
+      existing.status = action;
+    } else {
+      user.likedVideos.push({ videoId: videoIdStr, status: action });
+    }
+
+    await user.save();
+    return res.json({ success: true, likedVideos: user.likedVideos });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Get feedback for a user
+router.get('/video-feedback/:phone', async (req, res) => {
+  try {
+    const user = await User.findOne({ phone: req.params.phone });
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    res.json({ likedVideos: user.likedVideos });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to get feedback' });
+  }
+});
+
+router.post('/update', upload.single('avatar'), async (req, res) => {
+  const { phone, name, yearOfBirth, gender, email, language } = req.body;
+  console.log("Incoming update for phone:", phone);
+
+  let avatarUrl = null;
+
+  try {
+    if (req.file) {
+      const fileExt = path.extname(req.file.originalname);
+      const fileName = `${phone}-${crypto.randomBytes(6).toString('hex')}${fileExt}`;
+      console.log("Uploading avatar:", fileName);
+
+      const params = {
+        Bucket: process.env.WASABI_BUCKET,
+        Key: fileName,
+        Body: req.file.buffer,
+        ACL: 'public-read',
+        ContentType: req.file.mimetype,
+      };
+
+      const uploadResult = await s3.upload(params).promise();
+      avatarUrl = uploadResult.Location;
+      console.log("Avatar uploaded to:", avatarUrl);
+    } else {
+      console.log("No new avatar uploaded.");
+    }
+
+    const updatePayload = {
+      name,
+      yearOfBirth,
+      gender,
+      email,
+      language,
+    };
+
+    if (avatarUrl) {
+      updatePayload.avatar = avatarUrl;
+    }
+
+    console.log("Updating user with data:", updatePayload);
+
+    const updatedUser = await User.findOneAndUpdate(
+      { phone },
+      updatePayload,
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      console.log("User not found for phone:", phone);
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    console.log("User updated successfully:", updatedUser);
+    res.status(200).json({ success: true, user: updatedUser });
+  } catch (error) {
+    console.error('Error updating user:', error);
+    res.status(500).json({ success: false, error: 'Could not update user' });
+  }
+});
+
 
 
 module.exports = router

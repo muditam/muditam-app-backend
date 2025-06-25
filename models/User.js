@@ -1,5 +1,18 @@
 const mongoose = require('mongoose');
 
+// Subschema for video feedback
+const likedVideoSchema = new mongoose.Schema({
+  videoId: {
+    type: String,
+    required: true,
+  },
+  status: {
+    type: String,
+    enum: ['like', 'dislike'],
+    required: true,
+  },
+}, { _id: false });
+
 const userSchema = new mongoose.Schema({
   phone: {
     type: String,
@@ -10,6 +23,8 @@ const userSchema = new mongoose.Schema({
   yearOfBirth: String,
   gender: String, 
   email: String,
+  avatar: { type: String, default: '' },
+
   hasPurchased: {
     type: Boolean,
     default: false,  
@@ -23,10 +38,18 @@ const userSchema = new mongoose.Schema({
     default: [],
   },
   purchasedProducts: {
-  type: [String], // Shopify Product IDs
-  default: [],
-},
-  expoPushToken: { type: String },
+    type: [String],  
+    default: [],
+  },
+  expoPushToken: {
+    type: String,
+  },
+
+  likedVideos: {
+    type: [likedVideoSchema],
+    default: [],
+  },
+
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);

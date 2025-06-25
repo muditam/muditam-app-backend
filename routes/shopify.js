@@ -100,7 +100,7 @@ router.get('/product/:id', async (req, res) => {
       variants,
     });
   } catch (err) {
-    console.error('Shopify API error:', err.response?.data || err.message);
+    console.error('Shopify API error:', err.response?.data || err.message); 
     res.status(500).json({ error: 'Failed to fetch product details' });
   }
 });
