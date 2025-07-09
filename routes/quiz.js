@@ -32,7 +32,7 @@ router.post('/submit', async (req, res) => {
     res.status(200).json({ message: 'Quiz saved successfully', quiz });
   } catch (err) {
     console.error('Error saving quiz:', err);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: 'Server error' }); 
   }
 });
 

@@ -23,12 +23,12 @@ const upload = multer({ storage });
 
 // Create new user
 router.post('/', async (req, res) => {
-  const { phone, name, yearOfBirth, gender, email } = req.body;
+  const { phone, name, yearOfBirth, gender, email, preferredLanguage } = req.body;
   try {
     let user = await User.findOne({ phone });
     if (user) return res.status(200).json(user);  
 
-    user = new User({ phone, name, yearOfBirth, gender, email });
+    user = new User({ phone, name, yearOfBirth, gender, email, preferredLanguage });
     await user.save();
     return res.status(201).json(user);
   } catch (error) {
@@ -36,27 +36,6 @@ router.post('/', async (req, res) => {
     return res.status(500).json({ error: 'Could not create user' });
   }
 });
-
-// Update user details
-// router.post('/update', async (req, res) => {
-//   const { phone, name, yearOfBirth, gender, email } = req.body;
-//   try {
-//     const updatedUser = await User.findOneAndUpdate(
-//       { phone },
-//       { name, yearOfBirth, gender, email },
-//       { new: true }
-//     );
-
-//     if (!updatedUser) {
-//       return res.status(404).json({ success: false, message: 'User not found for update' });
-//     }
-
-//     return res.status(200).json({ success: true, message: 'User updated successfully', user: updatedUser });
-//   } catch (error) {
-//     console.error('Error updating user:', error);
-//     return res.status(500).json({ success: false, error: 'Could not update user' });
-//   }
-// });
 
 // Get user by phone
 router.get('/:phone', async (req, res) => {
@@ -196,7 +175,7 @@ router.get('/video-feedback/:phone', async (req, res) => {
 });
 
 router.post('/update', upload.single('avatar'), async (req, res) => {
-  const { phone, name, yearOfBirth, gender, email, language } = req.body;
+  const { phone, name, yearOfBirth, gender, email, preferredLanguage } = req.body;
   console.log("Incoming update for phone:", phone);
 
   let avatarUrl = null;
@@ -227,14 +206,14 @@ router.post('/update', upload.single('avatar'), async (req, res) => {
       yearOfBirth,
       gender,
       email,
-      language,
+      preferredLanguage,
     };
 
     if (avatarUrl) {
       updatePayload.avatar = avatarUrl;
     }
 
-    console.log("Updating user with data:", updatePayload);
+    console.log("Updating user with data:", updatePayload); 
 
     const updatedUser = await User.findOneAndUpdate(
       { phone },

@@ -13,11 +13,11 @@ const QuizSchema = new mongoose.Schema({
   height: {
     type: Number,
     required: true,
-  },
+  }, 
   weight: {
     type: Number,
-    required: true,
-  },
+    required: true, 
+  },          
   hba1c: {
     type: Number,
     required: true,

@@ -11,7 +11,7 @@ const likedVideoSchema = new mongoose.Schema({
     enum: ['like', 'dislike'],
     required: true,
   },
-}, { _id: false });
+}, { _id: false }); 
 
 const userSchema = new mongoose.Schema({
   phone: {
@@ -22,6 +22,11 @@ const userSchema = new mongoose.Schema({
   name: String,
   yearOfBirth: String,
   gender: String, 
+  preferredLanguage: {  
+    type: String,
+    enum: ['English', 'Hindi'],
+    default: 'English',
+  },
   email: String,
   avatar: { type: String, default: '' },
 
