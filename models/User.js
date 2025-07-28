@@ -11,7 +11,7 @@ const likedVideoSchema = new mongoose.Schema({
     enum: ['like', 'dislike'],
     required: true,
   },
-}, { _id: false }); 
+}, { _id: false });
 
 const userSchema = new mongoose.Schema({
   phone: {
@@ -21,8 +21,8 @@ const userSchema = new mongoose.Schema({
   },
   name: String,
   yearOfBirth: String,
-  gender: String, 
-  preferredLanguage: {  
+  gender: String,
+  preferredLanguage: {
     type: String,
     enum: ['English', 'Hindi'],
     default: 'English',
@@ -32,18 +32,23 @@ const userSchema = new mongoose.Schema({
 
   hasPurchased: {
     type: Boolean,
-    default: false,  
+    default: false,
   },
   currentKitNumber: {
     type: Number,
     default: 1,
   },
   completedKits: {
-    type: [Number],
+    type: [Number], 
     default: [],
   },
   purchasedProducts: {
-    type: [String],  
+    type: [
+      {
+        productId: { type: String, required: true },
+        purchasedAt: { type: Date, required: true, default: Date.now },
+      }
+    ],
     default: [],
   },
   expoPushToken: {

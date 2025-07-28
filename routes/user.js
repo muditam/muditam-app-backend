@@ -69,8 +69,13 @@ router.post('/mark-purchased', async (req, res) => {
       { phone },
       {
         hasPurchased: true,
-        $addToSet: {
-          purchasedProducts: { $each: purchasedProductIds || [] },
+        $push: {
+          purchasedProducts: {
+            $each: purchasedProductIds.map(id => ({
+              productId: String(id),
+              purchasedAt: new Date(),
+            })),
+          },
         },
       },
       { upsert: true, new: true }

@@ -8,7 +8,7 @@ const shopifyRoutes = require('./routes/shopify');
 const userRoutes = require('./routes/user');
 const quizRoutes = require('./routes/quiz'); 
 const cartRoutes = require('./routes/cart');
-const reminderRoutes = require('./routes/reminder');
+const reminderRoutes = require('./routes/reminder'); 
  
 const app = express(); 
 app.use(cors());
@@ -27,7 +27,7 @@ app.use('/api/shopify', shopifyRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/quiz', quizRoutes);
 app.use('/api/cart', cartRoutes);
-app.use('/api/reminder', reminderRoutes);
+app.use('/api/reminder', reminderRoutes); 
 
 
 const PORT = process.env.PORT || 3001;
