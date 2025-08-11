@@ -8,12 +8,12 @@ const likedVideoSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['like', 'dislike'],
+    enum: ['like', 'dislike'], 
     required: true,
   },
 }, { _id: false });
 
-const userSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema({ 
   phone: {
     type: String,
     required: true,
