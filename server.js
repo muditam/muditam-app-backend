@@ -5,6 +5,7 @@ require('dotenv').config();
 require('./cron/reminderCron');
 
 const shopifyRoutes = require('./routes/shopify');
+const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const quizRoutes = require('./routes/quiz'); 
 const cartRoutes = require('./routes/cart');
@@ -24,6 +25,7 @@ mongoose.connect(process.env.MONGO_URI, {
 
 // Routes
 app.use('/api/shopify', shopifyRoutes);
+app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/quiz', quizRoutes);
 app.use('/api/cart', cartRoutes);

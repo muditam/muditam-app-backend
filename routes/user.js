@@ -39,7 +39,7 @@ router.post('/', async (req, res) => {
     let user = await User.findOne({ phone });
     if (user) return res.status(200).json(user);  
 
-    user = new User({ phone, name, yearOfBirth, gender, email, preferredLanguage });
+    user = new User({ phone, name, yearOfBirth, gender, email, preferredLanguage }); 
     await user.save();
     return res.status(201).json(user);
   } catch (error) {
