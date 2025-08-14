@@ -97,7 +97,7 @@ router.post('/otp/send', sendLimiter, async (req, res) => {
     );
 
     // Log what MSG91 actually said (shows up in your server logs)
-    console.log('[send] MSG91 status:', r.status, 'data:', r.data);
+    console.log('[send] status MSG91:', r.status, 'data:', r.data);
 
     const data = r.data || {};
     const ok = data?.type === 'success';
