@@ -8,7 +8,7 @@ const https = require('https');
 
 const router = express.Router(); 
 
-const MSG91_KEY = process.env.MSG91_AUTHKEY; // keep this ONLY on the server
+const MSG91_KEY = process.env.MSG91_AUTHKEY; 
 if (!MSG91_KEY) {
   console.warn('[auth] Missing MSG91_AUTHKEY in env');
 }
@@ -46,7 +46,6 @@ const verifyLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// ---- SEND OTP ----
 // ---- SEND OTP ----
 router.post('/otp/send', sendLimiter, async (req, res) => {
   try {
