@@ -89,7 +89,7 @@ router.post('/otp/send', sendLimiter, async (req, res) => {
           'Content-Type': 'application/json',
           Accept: 'application/json',
         },
-        timeout: 10000, // 10s
+        timeout: 8000, // 10s
         httpAgent,
         httpsAgent,
         validateStatus: () => true,
@@ -140,7 +140,7 @@ router.post('/otp/verify', verifyLimiter, async (req, res) => {
       {
         headers: { authkey: MSG91_KEY, 'Content-Type': 'application/json' },
         params: { otp, mobile: `91${phone}` },
-        timeout: 10000, // 10s network timeout
+        timeout: 8000, // 10s network timeout
         httpAgent,
         httpsAgent,
         validateStatus: () => true,
